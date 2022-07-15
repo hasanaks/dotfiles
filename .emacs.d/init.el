@@ -1,53 +1,66 @@
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("elpa" . "https://elpa.gnu.org/packages/"))
+(package-initialize)
+
+(setq package-selected-packages
+      '(company
+	kaolin-themes
+	lsp-mode
+	org
+	org-bullets
+	use-package
+	yasnippet))
+
+(setq inhibit-startup-screen t)
+
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 
-(require 'package)
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(setq ring-bell-function 'ignore)
 
-(package-initialize)
+(set-frame-font "Fira Mono 16" nil t)
 
-(when (not package-archive-contents)
-  (package-refresh-contents))
+(setq backup-directory-alist '(("." . "~/.emacs.d/backups/")))
 
-(load-theme 'gruvbox t)
-(set-frame-font "Fira Mono 16")
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
-(setq-default
- ring-bell-function 'ignore
- 
- inhibit-startup-screen t ; no startup screen
- tab-width 2
+(electric-pair-mode 1)
 
- ; backup settings
- backup-by-copying t      ; don't clobber symlinks
- backup-directory-alist '(("." . "~/.emacs-saves/"))    ; don't litter my fs tree
- delete-old-versions t
- kept-new-versions 6
- kept-old-versions 2
- version-control t)       ; use versioned backups
+(use-package kaolin-themes
+  :config
+  (load-theme 'kaolin-dark t))
 
-(when (version<= "26.0.50" emacs-version)
-  (global-display-line-numbers-mode))
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
 
-(global-set-key "\M-p" 'hippie-expand)
+(use-package csharp-mode
+  :mode "\\.csx\\'")
 
-(defun open-user-init-file()
-	(interactive)
-	(find-file user-init-file))
+(use-package lsp-mode
+  :hook
+  ('c-mode . 'lsp)
+  ('c++-mode . 'lsp)
+  :init
+  (setq
+   lsp-keymap-prefix "C-ş"
+   lsp-headerline-breadcrumb-icons-enable nil))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-	 '("1436d643b98844555d56c59c74004eb158dc85fc55d2e7205f8d9b8c860e177f" "70cfdd2e7beaf492d84dfd5f1955ca358afb0a279df6bd03240c2ce74a578e9e" default))
- '(ispell-dictionary nil)
- '(package-selected-packages '(go-mode gruvbox-theme cmake-mode)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+(use-package yasnippet
+  :config
+  (yas-global-mode)
+  (delete-selection-mode))
+
+(use-package company
+  :init
+  (setq
+   company-minimum-prefix-length 1
+   company-idle-delay 0))
+
+(setq custom-file "~/.emacs.d/emacs-custom.el")
+(load custom-file)
