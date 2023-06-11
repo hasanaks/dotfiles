@@ -1,10 +1,3 @@
-call plug#begin()
-
-" minimalist colorscheme
-Plug 'dikiaap/minimalist'
-
-call plug#end()
-
 set nocompatible
 set noswapfile
 
@@ -28,12 +21,10 @@ set wildmenu
 
 set encoding=utf-8
 
-colorscheme minimalist
-
 set number
 set signcolumn=number
 
-set omnifunc=syntax#SyntaxComplete
+set omnifunc=syntaxcomplete#Complete
 
 nnoremap <Space> <Nop>
 let mapleader = ' '
